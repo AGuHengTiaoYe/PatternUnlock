@@ -2,7 +2,7 @@ package com.example.example_unlock
 
 import android.widget.ImageView
 
-class ViewModel(
+class LockModel(
     val view: ImageView,
     val normalResId: Int,
     val errorResId: Int
