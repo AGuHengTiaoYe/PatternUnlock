@@ -12,8 +12,7 @@ class LockPresenter(private val target:ILock) {
     //保存九个点
     private lateinit var dotArray: ArrayList<ImageView>
 
-    //模拟密码
-    private val password = "15369"
+
     //记录上一次被点亮的视图
     private var lastSelectedDot: ImageView? = null
     //记录密码
@@ -127,7 +126,7 @@ class LockPresenter(private val target:ILock) {
     fun touchup(x: Float,y: Float){
         binding.alertTitle.text = passwordBuilder.toString()
         //判断密码是否正确
-        if (passwordBuilder.toString() == password) {
+        if (passwordBuilder.toString() == LockModel().getPassword()) {
             //密码正确
             binding.alertTitle.text = "密码解锁成功"
             passwordBuilder.clear()
