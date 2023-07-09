@@ -25,14 +25,10 @@ class MainActivity : AppCompatActivity(),ILock {
         //将绑定类里面的view设置给activity
         setContentView(binding.root)
         presenter.initData(binding);
-        //找到容器
-        val container = findViewById<ConstraintLayout>(R.id.container)
-        //获取九个点的视图
-        container.findViewWithTag<ImageView>("1")
+
         //给容器添加触摸事件
         binding.container.setOnTouchListener { v, event ->
-            event.x
-            event.y
+            event.x; event.y
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> presenter.touchdown(event.x,event.y)
                 MotionEvent.ACTION_MOVE ->  presenter.touchmove(event.x,event.y)
@@ -42,6 +38,18 @@ class MainActivity : AppCompatActivity(),ILock {
         }
     }
 
+    override fun changeImage(model: Model,isNormal:Boolean) {
+        if (isNormal){
+            model.view.setImageResource(model.normalResId)
+        }else{
+            model.view.setImageResource(model.errorResId)
+        }
+    }
+
+    override fun changeVisibility(view: ImageView) {
+        if(view.visibility == View.VISIBLE) view.visibility = View.INVISIBLE
+        else view.visibility = View.VISIBLE
+    }
 
 
 }

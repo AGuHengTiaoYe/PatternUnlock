@@ -3,21 +3,21 @@ package com.example.example_unlock
 import android.os.Handler
 import android.view.View
 import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.example_unlock.databinding.ActivityMainBinding
 
 class LockPresenter(private val target:ILock) {
     private lateinit var binding:ActivityMainBinding
+
     //保存九个点
     private lateinit var dotArray: Array<ImageView>
     //保存所有的模型对象
-    private val modelArray = arrayListOf<LockModel>()
+    private val modelArray = arrayListOf<Model>()
+    //模拟密码
+    private val password = "15369"
     //记录上一次被点亮的视图
     private var lastSelectedDot: ImageView? = null
     //记录密码
     private val passwordBuilder = StringBuilder()
-    //模拟密码
-    private val password = "15369"
     //记录所有点亮的控件
     private val selectedArray = arrayListOf<ImageView>()
 
@@ -37,7 +37,7 @@ class LockPresenter(private val target:ILock) {
             binding.dot9
         )
         dotArray.forEach {
-            modelArray.add(LockModel(it, R.drawable.dot_normal, R.drawable.dot_selected))
+            modelArray.add(Model(it, R.drawable.dot_normal, R.drawable.dot_selected))
         }
         //竖线
         val verticalLineArray = arrayListOf(
@@ -49,7 +49,7 @@ class LockPresenter(private val target:ILock) {
             binding.line69
         )
         verticalLineArray.forEach {
-            modelArray.add(LockModel(it, R.drawable.line_1_normal, R.drawable.line_1_error))
+            modelArray.add(Model(it, R.drawable.line_1_normal, R.drawable.line_1_error))
         }
         //横线
         val landscapeLineArray = arrayListOf(
@@ -61,28 +61,21 @@ class LockPresenter(private val target:ILock) {
             binding.line89
         )
         landscapeLineArray.forEach {
-            modelArray.add(LockModel(it, R.drawable.line_2_normal, R.drawable.line_2_error))
+            modelArray.add(Model(it, R.drawable.line_2_normal, R.drawable.line_2_error))
         }
         //左斜
         val leftSlashLineArray =
             arrayListOf(binding.line24, binding.line35, binding.line57, binding.line68)
         leftSlashLineArray.forEach {
-            modelArray.add(LockModel(it, R.drawable.line_4_normal, R.drawable.line_4_error))
+            modelArray.add(Model(it, R.drawable.line_4_normal, R.drawable.line_4_error))
         }
         //右斜
         val rightSlashLineArray =
             arrayListOf(binding.line15, binding.line26, binding.line48, binding.line59)
         rightSlashLineArray.forEach {
-            modelArray.add(LockModel(it, R.drawable.line_3_normal, R.drawable.line_3_error))
+            modelArray.add(Model(it, R.drawable.line_3_normal, R.drawable.line_3_error))
         }
 
-    }
-
-
-
-    //返回dotArray
-    fun list():Array<ImageView>{
-        return dotArray
     }
 
     fun touchdown(x:Float,y:Float){
@@ -90,7 +83,7 @@ class LockPresenter(private val target:ILock) {
         val dotView = isInView(x, y)
         if (dotView != null) {
             //点亮原点
-            dotView.visibility = View.VISIBLE
+            target.changeVisibility(dotView)
             //记录下来
             lastSelectedDot = dotView
             //记录密码
@@ -109,7 +102,7 @@ class LockPresenter(private val target:ILock) {
             if (dotView != null) {
                 //判断是否是第一个点
                 if (lastSelectedDot == null) {
-                    dotView.visibility = View.VISIBLE
+                    target.changeVisibility(dotView)
                     lastSelectedDot = dotView
                     //记录密码
                     passwordBuilder.append(dotView.tag as String)
@@ -127,8 +120,9 @@ class LockPresenter(private val target:ILock) {
                         binding.container.findViewWithTag<ImageView>("$lineTag")
                     if (lineView != null) {
                         //有路线
-                        dotView.visibility = View.VISIBLE
-                        lineView.visibility = View.VISIBLE
+                        target.changeVisibility(dotView)
+                        target.changeVisibility(lineView)
+
                         lastSelectedDot = dotView
                         //记录密码
                         passwordBuilder.append(dotView.tag as String)
@@ -155,7 +149,7 @@ class LockPresenter(private val target:ILock) {
                 //找到这个控件对应的model
                 for (model in modelArray) {
                     if (model.view == it) {
-                        model.changeImage(false)
+                        target.changeImage(model,false)
                         passwordBuilder.clear()
                         break
                     }
@@ -165,11 +159,11 @@ class LockPresenter(private val target:ILock) {
         Handler().postDelayed(
             {
                 selectedArray.forEach {
-                    it.visibility = View.INVISIBLE
+                    target.changeVisibility(it)
                     //找到这个控件对应的model
                     for (model in modelArray) {
                         if (model.view == it) {
-                            model.changeImage(true)
+                            target.changeImage(model,true)
                             break
                         }
                     }
