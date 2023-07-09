@@ -4,14 +4,14 @@ import android.os.Handler
 import android.view.View
 import android.widget.ImageView
 import com.example.example_unlock.databinding.ActivityMainBinding
+import java.util.concurrent.locks.Lock
 
 class LockPresenter(private val target:ILock) {
     private lateinit var binding:ActivityMainBinding
 
     //保存九个点
-    private lateinit var dotArray: Array<ImageView>
-    //保存所有的模型对象
-    private val modelArray = arrayListOf<Model>()
+    private lateinit var dotArray: ArrayList<ImageView>
+
     //模拟密码
     private val password = "15369"
     //记录上一次被点亮的视图
@@ -25,7 +25,7 @@ class LockPresenter(private val target:ILock) {
     fun initData(binding : ActivityMainBinding){
         this.binding = binding
         //将九个点的视图保存到数组中
-        dotArray = arrayOf(
+        val dotArray = arrayListOf(
             binding.dot1,
             binding.dot2,
             binding.dot3,
@@ -36,9 +36,6 @@ class LockPresenter(private val target:ILock) {
             binding.dot8,
             binding.dot9
         )
-        dotArray.forEach {
-            modelArray.add(Model(it, R.drawable.dot_normal, R.drawable.dot_selected))
-        }
         //竖线
         val verticalLineArray = arrayListOf(
             binding.line14,
@@ -48,9 +45,6 @@ class LockPresenter(private val target:ILock) {
             binding.line58,
             binding.line69
         )
-        verticalLineArray.forEach {
-            modelArray.add(Model(it, R.drawable.line_1_normal, R.drawable.line_1_error))
-        }
         //横线
         val landscapeLineArray = arrayListOf(
             binding.line12,
@@ -60,21 +54,16 @@ class LockPresenter(private val target:ILock) {
             binding.line78,
             binding.line89
         )
-        landscapeLineArray.forEach {
-            modelArray.add(Model(it, R.drawable.line_2_normal, R.drawable.line_2_error))
-        }
         //左斜
-        val leftSlashLineArray =
-            arrayListOf(binding.line24, binding.line35, binding.line57, binding.line68)
-        leftSlashLineArray.forEach {
-            modelArray.add(Model(it, R.drawable.line_4_normal, R.drawable.line_4_error))
-        }
+        val leftSlashLineArray = arrayListOf(binding.line24, binding.line35, binding.line57, binding.line68)
         //右斜
-        val rightSlashLineArray =
-            arrayListOf(binding.line15, binding.line26, binding.line48, binding.line59)
-        rightSlashLineArray.forEach {
-            modelArray.add(Model(it, R.drawable.line_3_normal, R.drawable.line_3_error))
-        }
+        val rightSlashLineArray = arrayListOf(binding.line15, binding.line26, binding.line48, binding.line59)
+
+        LockModel().addModel(dotArray,R.drawable.dot_normal, R.drawable.dot_selected)
+        LockModel().addModel(verticalLineArray, R.drawable.line_1_normal, R.drawable.line_1_error)
+        LockModel().addModel(landscapeLineArray, R.drawable.line_2_normal, R.drawable.line_2_error)
+        LockModel().addModel(leftSlashLineArray, R.drawable.line_3_normal, R.drawable.line_3_error)
+        LockModel().addModel(rightSlashLineArray, R.drawable.line_4_normal, R.drawable.line_4_error)
 
     }
 
@@ -147,7 +136,7 @@ class LockPresenter(private val target:ILock) {
             //切换图片
             selectedArray.forEach {
                 //找到这个控件对应的model
-                for (model in modelArray) {
+                for(model:Model in LockModel().getModels()){
                     if (model.view == it) {
                         target.changeImage(model,false)
                         passwordBuilder.clear()
@@ -161,7 +150,7 @@ class LockPresenter(private val target:ILock) {
                 selectedArray.forEach {
                     target.changeVisibility(it)
                     //找到这个控件对应的model
-                    for (model in modelArray) {
+                    for(model:Model in LockModel().getModels()) {
                         if (model.view == it) {
                             target.changeImage(model,true)
                             break

@@ -8,6 +8,5 @@ class Model(
     val errorResId: Int
 ) {
 
-    fun Model(){}
 
 }
